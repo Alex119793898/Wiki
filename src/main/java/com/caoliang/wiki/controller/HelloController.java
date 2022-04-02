@@ -1,17 +1,17 @@
 package com.caoliang.wiki.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 public class HelloController {
 
-    @RequestMapping("/hello")
-    @ResponseBody
+    @GetMapping("/hello")
     public String hello(){
-        System.out.println("slfjksjk");
         return "hello spring!";
+    }
+
+    @PostMapping("/hello/post")
+    public String helloPost(String name){
+        return "hello spring POST" + name + "!";
     }
 }
