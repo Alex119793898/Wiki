@@ -1,5 +1,17 @@
 spring:
   application:
     name: wiki
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/wiki
+    username: root
+    password: 12345678
 server:
   port: 8081
+
+mybatis:
+  type-aliases-package: com.caoliang.wiki.pojo
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  mapper-locations: classpath:mapper/**/*.xml
+
