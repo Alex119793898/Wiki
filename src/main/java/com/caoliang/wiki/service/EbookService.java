@@ -5,11 +5,10 @@ import com.caoliang.wiki.pojo.Ebook;
 import com.caoliang.wiki.pojo.EbookExample;
 import com.caoliang.wiki.req.EbookReq;
 import com.caoliang.wiki.req.EbookResp;
-import org.springframework.beans.BeanUtils;
+import com.caoliang.wiki.util.CopyUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,14 +24,20 @@ public class EbookService {
 
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
-        ArrayList<EbookResp> respList = new ArrayList<>();
+        /*ArrayList<EbookResp> respList = new ArrayList<>();
 
         for (Ebook ebook : ebookList) {
-            EbookResp ebookResp = new EbookResp();
-            BeanUtils.copyProperties(ebook,ebookResp);
-            respList.add(ebookResp);
-        }
+            *//*EbookResp ebookResp = new EbookResp();
+            BeanUtils.copyProperties(ebook,ebookResp);*//*
+            EbookResp copyResp = CopyUtil.copy(ebook, EbookResp.class);
+            respList.add(copyResp);
+        }*/
 
-        return respList;
+        /*
+        * CopyUtil.copyList列表复制
+        * */
+        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
+
+        return list;
     }
 }
