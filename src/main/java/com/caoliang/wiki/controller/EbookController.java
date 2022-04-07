@@ -1,6 +1,7 @@
 package com.caoliang.wiki.controller;
 
-import com.caoliang.wiki.pojo.Ebook;
+import com.caoliang.wiki.req.EbookReq;
+import com.caoliang.wiki.req.EbookResp;
 import com.caoliang.wiki.resp.CommonResp;
 import com.caoliang.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,9 +19,9 @@ public class EbookController {
     private EbookService ebookService;
 
     @GetMapping("/list")
-    public CommonResp list(){
-        CommonResp<List<Ebook>> resp = new CommonResp<>();
-        List<Ebook> list = ebookService.list();
+    public CommonResp list(EbookReq req){
+        CommonResp<List<EbookResp>> resp = new CommonResp<>();
+        List<EbookResp> list = ebookService.list(req);
         resp.setContent(list);
         return resp;
     }
