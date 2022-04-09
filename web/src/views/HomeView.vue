@@ -45,13 +45,14 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      Content111
+      <pre>{{ebookList1}}</pre>
+      <pre>{{ebookList2}}</pre>
     </a-layout-content>
   </a-layout>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, onMounted, ref, reactive, toRef } from 'vue';
 import axios from "axios";
 export default defineComponent({
   name: 'HomeView',
@@ -61,8 +62,17 @@ export default defineComponent({
   setup() {
 
     console.log('setup')
-    axios.get("http://localhost:8081/ebook/list?name=Spring").then(res=>{
-      console.log(res)
+
+    const ebookList1 = ref();
+    const ebookList2 = reactive({books:[]});
+
+    onMounted(()=>{
+      console.log("onMonted");
+
+      axios.get("http://localhost:8081/ebook/list?name=Spring").then(res=>{
+        ebookList1.value = res.data;
+        ebookList2.books = res.data;
+      })
     })
 
     return {
@@ -70,6 +80,8 @@ export default defineComponent({
       selectedKeys2: ref<string[]>(['1']),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(['sub1']),
+      ebookList1,
+      ebookList2: toRef(ebookList2, "books")
     };
 
 
