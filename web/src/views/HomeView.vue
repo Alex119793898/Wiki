@@ -52,17 +52,27 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import axios from "axios";
 export default defineComponent({
   name: 'HomeView',
   components: {
+
   },
   setup() {
+
+    console.log('setup')
+    axios.get("http://localhost:8081/ebook/list?name=Spring").then(res=>{
+      console.log(res)
+    })
+
     return {
       selectedKeys1: ref<string[]>(['2']),
       selectedKeys2: ref<string[]>(['1']),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(['sub1']),
     };
+
+
   },
 });
 </script>
