@@ -45,8 +45,25 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <pre>{{ebookList1}}</pre>
-      <pre>{{ebookList2}}</pre>
+      <a-list :grid="{ gutter: 20, column: 3 }" :data-source="ebookList">
+        <template #renderItem="{ item }">
+          <a-list-item key="item.name">
+            <template #actions>
+              <span v-for="{ type, text } in actions" :key="type">
+                <component :is="type" style="margin-right: 8px" />
+                {{ text }}
+              </span>
+            </template>
+            <a-list-item-meta :description="item.description">
+              <template #title>
+                <a :href="item.href">{{ item.name }}</a>
+              </template>
+              <template #avatar><a-avatar :src="item.cover" /></template>
+            </a-list-item-meta>
+          </a-list-item>
+        </template>
+      </a-list>
+
     </a-layout-content>
   </a-layout>
 </template>
@@ -54,6 +71,7 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref, reactive, toRef } from 'vue';
 import axios from "axios";
+
 export default defineComponent({
   name: 'HomeView',
   components: {
@@ -61,17 +79,12 @@ export default defineComponent({
   },
   setup() {
 
-    console.log('setup')
-
-    const ebookList1 = ref();
-    const ebookList2 = reactive({books:[]});
+    const ebookList = ref();
 
     onMounted(()=>{
-      console.log("onMonted");
-
-      axios.get("http://localhost:8081/ebook/list?name=Spring").then(res=>{
-        ebookList1.value = res.data;
-        ebookList2.books = res.data;
+      axios.get("http://localhost:8081/ebook/list").then(res=>{
+        ebookList.value = res.data.content;
+        console.log(ebookList.value)
       })
     })
 
@@ -80,11 +93,24 @@ export default defineComponent({
       selectedKeys2: ref<string[]>(['1']),
       collapsed: ref<boolean>(false),
       openKeys: ref<string[]>(['sub1']),
-      ebookList1,
-      ebookList2: toRef(ebookList2, "books")
+      ebookList,
+      actions: [
+        { type: 'StarOutlined', text: '156' },
+        { type: 'LikeOutlined', text: '156' },
+        { type: 'MessageOutlined', text: '2' },
+      ]
     };
 
 
   },
 });
 </script>
+<style scoped>
+.ant-avatar {
+  width: 50px;
+  height: 50px;
+  line-height: 50px;
+  border-radius: 8%;
+  margin: 5px 0;
+}
+</style>
