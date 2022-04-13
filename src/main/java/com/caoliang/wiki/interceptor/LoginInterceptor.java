@@ -1,3 +1,4 @@
+/*
 package com.caoliang.wiki.interceptor;
 
 import org.slf4j.Logger;
@@ -36,3 +37,4 @@ public class LoginInterceptor implements HandlerInterceptor {
 
     }
 }
+*/
