@@ -6,8 +6,8 @@
   </a-layout>
 </template>
 <script lang="ts">
-import TheHeader from '@/components/TheHeader.vue'
-import TheFooter from '@/components/TheFooter.vue'
+import TheHeader from '@/components/the-header.vue'
+import TheFooter from '@/components/the-footer.vue'
 import { defineComponent, ref } from 'vue';
 export default defineComponent({
   components: {
