@@ -5,100 +5,69 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-table :columns="columns" :data-source="data">
-        <template #headerCell="{ column }">
-          <template v-if="column.key === 'name'">
-        <span>
-          <smile-outlined />
-          Name
-        </span>
+      <a-table
+          :columns="columns"
+          :data-source="ebooks"
+          :pagination="pagination"
+          :loading="loading"
+          @change="pageChange"
+      >
+        <template #bodyCell="{column,record}">
+          <template v-if="column.key == 'cover'">
+            <img :src="record.cover" alt="avater">
           </template>
-        </template>
+          <template v-else-if="column.key == 'action'">
+            <a-space size="small">
+              <a-button type="primary" @click="edit(record)">编辑</a-button>
+              <a-button type="danger">删除</a-button>
+            </a-space>
 
-        <template #bodyCell="{ column, record }">
-          <template v-if="column.key === 'name'">
-            <a>
-              {{ record.name }}
-            </a>
-          </template>
-          <template v-else-if="column.key === 'tags'">
-        <span>
-          <a-tag
-              v-for="tag in record.tags"
-              :key="tag"
-              :color="tag === 'loser' ? 'volcano' : tag.length > 5 ? 'geekblue' : 'green'"
-          >
-            {{ tag.toUpperCase() }}
-          </a-tag>
-        </span>
-          </template>
-          <template v-else-if="column.key === 'action'">
-        <span>
-          <a>Invite 一 {{ record.name }}</a>
-          <a-divider type="vertical" />
-          <a>Delete</a>
-          <a-divider type="vertical" />
-          <a class="ant-dropdown-link">
-            More actions
-            <down-outlined />
-          </a>
-        </span>
           </template>
         </template>
+        <!--<template v-slot:cover="{record}">
+          <img :src="record.cover" alt="avater">
+        </template>-->
       </a-table>
     </a-layout-content>
   </a-layout>
 </template>
 <script>
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
+import axios from "axios";
 const columns = [
   {
-    name: 'Name',
-    dataIndex: 'name',
-    key: 'name',
+    title: '封面',
+    dataIndex: 'cover',
+    key:'cover',
   },
   {
-    title: 'Age',
-    dataIndex: 'age',
+    title: '名称',
+    dataIndex: 'name',
     key: 'age',
   },
   {
-    title: 'Address',
-    dataIndex: 'address',
-    key: 'address',
+    title: '分类一',
+    dataIndex: 'category1Id',
   },
   {
-    title: 'Tags',
-    key: 'tags',
-    dataIndex: 'tags',
+    title: '分类二',
+    dataIndex: 'category2Id',
   },
   {
-    title: 'Action',
+    title: '文档数',
+    dataIndex: 'docCount',
+  },
+  {
+    title: '阅读数',
+    dataIndex: 'viewCount',
+  },
+  {
+    title: '点赞数',
+    dataIndex: 'voteCount',
+  },
+  {
+    title: '操作',
     key: 'action',
-  },
-];
-
-const data = [
-  {
-    key: '1',
-    name: 'John Brown',
-    age: 32,
-    address: 'New York No. 1 Lake Park',
-    tags: ['nice', 'developer'],
-  },
-  {
-    key: '2',
-    name: 'Jim Green',
-    age: 42,
-    address: 'London No. 1 Lake Park',
-    tags: ['loser'],
-  },
-  {
-    key: '3',
-    name: 'Joe Black',
-    age: 32,
-    address: 'Sidney No. 1 Lake Park',
-    tags: ['cool', 'teacher'],
   },
 ];
 
@@ -107,10 +76,58 @@ export default defineComponent({
   components: {
   },
   setup() {
+
+    const ebooks = ref()
+    const pagination = ref({
+      current: 1,
+      pageSize: 2,
+      total: 0
+    })
+    const loading = ref(false);
+
+    const pageChange = pagination =>{
+      console.log("分页参数",pagination)
+      handleQuery({
+        page:pagination.current,
+        size:pagination.pageSize
+      })
+    }
+
+    const handleQuery = params =>{
+      loading.value = true;
+      axios.get("/ebook/list",{
+        params,
+      }).then(res=>{
+        loading.value = false;
+        ebooks.value = res.data.content;
+        pagination.value.total = res.data.content.length;
+
+        pagination.value.current = params.page;
+      })
+    }
+
+    const edit = record => {
+      console.log(record)
+    }
+
+    onMounted(()=>{
+      handleQuery({});
+    })
     return {
-      data,
+      edit,
+      pageChange,
+
+      pagination,
+      loading,
+      ebooks,
       columns,
     };
   },
 });
 </script>
+<style scoped>
+img {
+  width: 50px;
+  height: 50px;
+}
+</style>
