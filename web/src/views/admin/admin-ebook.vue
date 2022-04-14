@@ -1,6 +1,4 @@
 <template>
-
-
   <a-layout>
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
@@ -9,7 +7,7 @@
           :columns="columns"
           :data-source="ebooks"
           :pagination="pagination"
-          :loading="loading"
+          :loading="tableLoading"
           @change="pageChange"
       >
         <template #bodyCell="{column,record}">
@@ -30,9 +28,40 @@
       </a-table>
     </a-layout-content>
   </a-layout>
+
+  <div>
+    <a-modal
+        title="电子书表单"
+        v-model:visible="modalVisible"
+        :confirm-loading="modalLoading"
+        @ok="handleOk"
+    >
+      <a-form :model="ebook" :label-col="{span:6}">
+        <a-form-item label="封面">
+          <a-input v-model:value="ebook.cover" />
+        </a-form-item>
+        <a-form-item label="名称">
+          <a-input v-model:value="ebook.name" />
+        </a-form-item>
+        <a-form-item label="分类一">
+          <a-input v-model:value="ebook.category1Id" />
+        </a-form-item>
+        <a-form-item label="分类二">
+          <a-input v-model:value="ebook.category2Id" />
+        </a-form-item>
+        <a-form-item label="描述">
+          <a-input v-model:value="ebook.descriptionn" />
+        </a-form-item>
+        <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
+          <a-button type="primary" @click="onSubmit">Create</a-button>
+          <a-button style="margin-left: 10px">Cancel</a-button>
+        </a-form-item>
+      </a-form>
+    </a-modal>
+  </div>
 </template>
 <script>
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, reactive } from 'vue';
 import axios from "axios";
 const columns = [
   {
@@ -78,17 +107,49 @@ export default defineComponent({
   setup() {
 
     const ebooks = ref()
+    const tableLoading = ref(false);
     const pagination = ref({
       current: 1,
       pageSize: 4,
       total: 0
     })
-    const loading = ref(false);
+
+    /*弹窗*/
+    const modalText = ref('Content of the modal');
+    const modalVisible = ref(false);
+    const modalLoading = ref(false);
+
+    const handleOk = () => {
+      modalText.value = 'The modal will be closed after two seconds';
+      modalLoading.value = true;
+      setTimeout(() => {
+        modalVisible.value = false;
+        modalLoading.value = false;
+      }, 2000);
+    }
+
+    /*表单*/
+    const ebook = ref({
+      data:{
+        cover:'',
+        name: '',
+        category1Id: '',
+        category2Id: '',
+        descriptionn: '',
+      }
+    });
+
+    const onSubmit = () => {
+      console.log('submit!');
+    };
 
     const edit = record => {
       console.log(record)
+      ebook.value = record;
+      modalVisible.value = true;
     }
 
+    /*分页*/
     const pageChange = pageParam =>{
       console.log("分页参数",pageParam)
       handleQuery({
@@ -99,12 +160,13 @@ export default defineComponent({
       pagination.value.current = pageParam.current;
     }
 
+    /*请求*/
     const handleQuery = params =>{
-      loading.value = true;
+      tableLoading.value = true;
       axios.get("/ebook/list",{
         params,
       }).then(res=>{
-        loading.value = false;
+        tableLoading.value = false;
         ebooks.value = res.data.content.list;
         pagination.value.total = res.data.content.total;
 
@@ -121,8 +183,16 @@ export default defineComponent({
       edit,
       pageChange,
 
+      handleOk,
+      modalText,
+      modalVisible,
+      modalLoading,
+
+      ebook,
+      onSubmit,
+
       pagination,
-      loading,
+      tableLoading,
       ebooks,
       columns,
     };
