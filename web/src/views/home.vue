@@ -82,8 +82,8 @@ export default defineComponent({
     const ebookList = ref();
 
     onMounted(()=>{
-      axios.get("/ebook/list").then(res=>{
-        ebookList.value = res.data.content;
+      axios.get("/ebook/list",{params:{page:1,size:1000}}).then(res=>{
+        ebookList.value = res.data.content.list;
       })
     })
 
