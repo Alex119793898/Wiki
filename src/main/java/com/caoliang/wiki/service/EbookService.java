@@ -3,8 +3,9 @@ package com.caoliang.wiki.service;
 import com.caoliang.wiki.mapper.EbookMapper;
 import com.caoliang.wiki.pojo.Ebook;
 import com.caoliang.wiki.pojo.EbookExample;
-import com.caoliang.wiki.req.EbookReq;
-import com.caoliang.wiki.resp.EbookResp;
+import com.caoliang.wiki.req.EbookQueryReq;
+import com.caoliang.wiki.req.EbookSaveReq;
+import com.caoliang.wiki.resp.EbookQueryResp;
 import com.caoliang.wiki.resp.PageResp;
 import com.caoliang.wiki.util.CopyUtil;
 import com.github.pagehelper.PageHelper;
@@ -25,7 +26,7 @@ public class EbookService {
     @Autowired(required = false)
     private EbookMapper ebookMapper;
 
-    public PageResp<EbookResp> list(EbookReq req){
+    public PageResp<EbookQueryResp> list(EbookQueryReq req){
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
 
@@ -52,12 +53,23 @@ public class EbookService {
         /*
         * CopyUtil.copyList列表复制
         * */
-        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
+        List<EbookQueryResp> list = CopyUtil.copyList(ebookList, EbookQueryResp.class);
 
-        PageResp<EbookResp> pageResp = new PageResp<>();
+        PageResp<EbookQueryResp> pageResp = new PageResp<>();
         pageResp.setList(list);
         pageResp.setTotal(pageInfo.getTotal());
 
         return pageResp;
+    }
+
+
+    public void save(EbookSaveReq req) {
+
+        Ebook copy = CopyUtil.copy(req, Ebook.class);
+        if(ObjectUtils.isEmpty(req.getId())){
+            ebookMapper.insert(copy);
+        }else{
+            ebookMapper.updateByPrimaryKey(copy);
+        }
     }
 }
