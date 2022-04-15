@@ -6,15 +6,16 @@ import com.caoliang.wiki.pojo.EbookExample;
 import com.caoliang.wiki.req.EbookReq;
 import com.caoliang.wiki.resp.EbookResp;
 import com.caoliang.wiki.resp.PageResp;
-import com.caoliang.wiki.util.CopyUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -40,20 +41,20 @@ public class EbookService {
         LOG.info("总行数:{}",pageInfo.getTotal());
         LOG.info("总页数:{}",pageInfo.getPages());
 
-        /*ArrayList<EbookResp> respList = new ArrayList<>();
+        ArrayList<EbookResp> list = new ArrayList<>();
 
         for (Ebook ebook : ebookList) {
-            *//*EbookResp ebookResp = new EbookResp();
-            BeanUtils.copyProperties(ebook,ebookResp);*//*
-            EbookResp copyResp = CopyUtil.copy(ebook, EbookResp.class);
-            respList.add(copyResp);
-        }*/
+            EbookResp ebookResp = new EbookResp();
+            BeanUtils.copyProperties(ebook,ebookResp);
+            //EbookResp ebookResp = CopyUtil.copy(ebook, EbookResp.class);
+            list.add(ebookResp);
+        }
 
         /*
         * CopyUtil.copyList列表复制
         * */
         PageResp<EbookResp> resp = new PageResp<>();
-        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
+        //List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
         resp.setList(list);
         resp.setTotal(pageInfo.getTotal());
 
