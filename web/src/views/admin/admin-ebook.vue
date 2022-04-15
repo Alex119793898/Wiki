@@ -99,8 +99,8 @@ export default defineComponent({
         params,
       }).then(res=>{
         loading.value = false;
-        ebooks.value = res.data.content;
-        pagination.value.total = res.data.content.length;
+        ebooks.value = res.data.content.list;
+        pagination.value.total = res.data.content.total;
 
         pagination.value.current = params.page;
       })
@@ -111,7 +111,10 @@ export default defineComponent({
     }
 
     onMounted(()=>{
-      handleQuery({});
+      handleQuery({
+        page: 1,
+          size: pagination.value.pageSize
+      });
     })
     return {
       edit,
