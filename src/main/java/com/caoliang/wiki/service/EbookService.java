@@ -8,6 +8,7 @@ import com.caoliang.wiki.req.EbookSaveReq;
 import com.caoliang.wiki.resp.EbookQueryResp;
 import com.caoliang.wiki.resp.PageResp;
 import com.caoliang.wiki.util.CopyUtil;
+import com.caoliang.wiki.util.SnowFlake;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
@@ -25,6 +27,9 @@ public class EbookService {
 
     @Autowired(required = false)
     private EbookMapper ebookMapper;
+
+    @Resource
+    private SnowFlake snowFlake;
 
     public PageResp<EbookQueryResp> list(EbookQueryReq req){
         EbookExample ebookExample = new EbookExample();
@@ -67,8 +72,12 @@ public class EbookService {
 
         Ebook copy = CopyUtil.copy(req, Ebook.class);
         if(ObjectUtils.isEmpty(req.getId())){
+            //新增
+            long id = snowFlake.nextId();
+            copy.setId(id);
             ebookMapper.insert(copy);
         }else{
+            //更新
             ebookMapper.updateByPrimaryKey(copy);
         }
     }

@@ -3,6 +3,9 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <p>
+        <a-button type="primary" @click="add()">新增</a-button>
+      </p>
       <a-table
           :columns="columns"
           :data-source="ebooks"
@@ -51,10 +54,6 @@
         </a-form-item>
         <a-form-item label="描述">
           <a-input v-model:value="ebook.descriptionn" />
-        </a-form-item>
-        <a-form-item :wrapper-col="{ span: 14, offset: 4 }">
-          <a-button type="primary" @click="onSubmit">Create</a-button>
-          <a-button style="margin-left: 10px">Cancel</a-button>
         </a-form-item>
       </a-form>
     </a-modal>
@@ -146,13 +145,15 @@ export default defineComponent({
       }
     });
 
-    const onSubmit = () => {
-      //console.log('submit!');
-    };
-
     const edit = record => {
       console.log(record)
-      ebook.value = record;
+
+      ebook.value = JSON.parse(JSON.stringify(record));
+      modalVisible.value = true;
+    }
+
+    const add = ()=>{
+      ebook.value = {};
       modalVisible.value = true;
     }
 
@@ -188,16 +189,14 @@ export default defineComponent({
     })
     return {
       edit,
+      add,
+      ebook,
       pageChange,
 
       handleOk,
       modalText,
       modalVisible,
       modalLoading,
-
-      ebook,
-      onSubmit,
-
       pagination,
       tableLoading,
       ebooks,
