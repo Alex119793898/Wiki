@@ -4,7 +4,8 @@ import com.caoliang.wiki.mapper.EbookMapper;
 import com.caoliang.wiki.pojo.Ebook;
 import com.caoliang.wiki.pojo.EbookExample;
 import com.caoliang.wiki.req.EbookReq;
-import com.caoliang.wiki.req.EbookResp;
+import com.caoliang.wiki.resp.EbookResp;
+import com.caoliang.wiki.resp.PageResp;
 import com.caoliang.wiki.util.CopyUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
@@ -24,7 +25,7 @@ public class EbookService {
     @Autowired(required = false)
     private EbookMapper ebookMapper;
 
-    public List<EbookResp> list(EbookReq req){
+    public PageResp<EbookResp> list(EbookReq req){
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
 
@@ -32,7 +33,7 @@ public class EbookService {
             criteria.andNameLike("%" + req.getName() + "%");
         }
 
-        PageHelper.startPage(1,3);
+        PageHelper.startPage(req.getPage(),req.getSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
 
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
@@ -53,6 +54,10 @@ public class EbookService {
         * */
         List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
 
-        return list;
+        PageResp<EbookResp> pageResp = new PageResp<>();
+        pageResp.setList(list);
+        pageResp.setTotal(pageInfo.getTotal());
+
+        return pageResp;
     }
 }
