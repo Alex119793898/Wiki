@@ -1,4 +1,4 @@
-package com.caoliang.wiki.req;
+package com.caoliang.wiki.resp;
 
 public class EbookResp {
     private Long id;
