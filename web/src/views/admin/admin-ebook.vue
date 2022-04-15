@@ -80,17 +80,23 @@ export default defineComponent({
     const ebooks = ref()
     const pagination = ref({
       current: 1,
-      pageSize: 2,
+      pageSize: 4,
       total: 0
     })
     const loading = ref(false);
 
-    const pageChange = pagination =>{
-      console.log("分页参数",pagination)
+    const edit = record => {
+      console.log(record)
+    }
+
+    const pageChange = pageParam =>{
+      console.log("分页参数",pageParam)
       handleQuery({
-        page:pagination.current,
-        size:pagination.pageSize
+        page:pageParam.current,
+        size:pageParam.pageSize
       })
+
+      pagination.value.current = pageParam.current;
     }
 
     const handleQuery = params =>{
@@ -99,19 +105,17 @@ export default defineComponent({
         params,
       }).then(res=>{
         loading.value = false;
-        ebooks.value = res.data.content;
-        pagination.value.total = res.data.content.length;
+        ebooks.value = res.data.content.list;
+        pagination.value.total = res.data.content.total;
 
-        pagination.value.current = params.page;
       })
     }
 
-    const edit = record => {
-      console.log(record)
-    }
-
     onMounted(()=>{
-      handleQuery({});
+      handleQuery({
+        page: 1,
+        size: pagination.value.pageSize
+      });
     })
     return {
       edit,
