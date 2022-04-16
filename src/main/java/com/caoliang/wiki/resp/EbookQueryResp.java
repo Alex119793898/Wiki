@@ -1,6 +1,10 @@
 package com.caoliang.wiki.resp;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.caoliang.wiki.config.LongToStringSerializer;
+
 public class EbookQueryResp {
+    @JSONField(serializeUsing = LongToStringSerializer.class)
     private Long id;
 
     private String name;
