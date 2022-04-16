@@ -69,6 +69,8 @@
 <script>
 import { defineComponent, onMounted, ref, reactive } from 'vue';
 import axios from "axios";
+import { message } from 'ant-design-vue';
+
 const columns = [
   {
     title: '封面',
@@ -193,9 +195,13 @@ export default defineComponent({
         params,
       }).then(res=>{
         tableLoading.value = false;
-        ebooks.value = res.data.content.list;
-        pagination.value.total = res.data.content.total;
-
+        const data = res.data;
+        if(data.success){
+          ebooks.value = data.content.list;
+          pagination.value.total = data.content.total;
+        }else{
+          message.warning(data.message)
+        }
       })
     }
 
