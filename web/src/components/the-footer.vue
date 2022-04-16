@@ -2,6 +2,13 @@
   <a-layout-footer style="text-align: center">
     Ant Design ©2018 Created by Ant UED
     <!--{{obj.a}} {{params}} <span>{{list}}</span>-->
+
+    <!--{{title}} {{num}}
+    <span>
+      <a v-for="item in categorys" :key="item">
+        {{item}}
+      </a>
+    </span>-->
   </a-layout-footer>
 </template>
 
@@ -11,6 +18,13 @@ import {defineComponent, ref, reactive} from 'vue';
 export default defineComponent({
   name: 'TheFooter',
   setup(){
+    /*
+    * 普通数据更新以后不会重新渲染视图
+    * */
+    let title = '商品分类';
+    let num = 30;
+    let categorys = ['女装', '男装', '家电'];
+
     /*
     * ref 使用规律
     * */
@@ -33,6 +47,10 @@ export default defineComponent({
     //console.log(list)
 
     return{
+      title,
+      num,
+      categorys,
+
       obj,
       params,
       list

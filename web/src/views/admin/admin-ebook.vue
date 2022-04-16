@@ -126,10 +126,10 @@ export default defineComponent({
   setup() {
 
     const ebooks = ref()
-    const queryForm = ref();
-    queryForm.value = {
+    const queryForm = ref({
       name:null
-    };
+    });
+    
     const tableLoading = ref(false);
     const pagination = ref({
       current: 1,
