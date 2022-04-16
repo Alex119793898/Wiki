@@ -13,7 +13,7 @@ public class EbookQueryResp {
 
     private Long category2Id;
 
-    private String descriptionn;
+    private String description;
 
     private String cover;
 
@@ -55,12 +55,12 @@ public class EbookQueryResp {
         this.category2Id = category2Id;
     }
 
-    public String getDescriptionn() {
-        return descriptionn;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescriptionn(String descriptionn) {
-        this.descriptionn = descriptionn;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public String getCover() {
@@ -105,7 +105,7 @@ public class EbookQueryResp {
         sb.append(", name=").append(name);
         sb.append(", category1Id=").append(category1Id);
         sb.append(", category2Id=").append(category2Id);
-        sb.append(", descriptionn=").append(descriptionn);
+        sb.append(", description=").append(description);
         sb.append(", cover=").append(cover);
         sb.append(", docCount=").append(docCount);
         sb.append(", viewCount=").append(viewCount);
