@@ -4,7 +4,18 @@
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
       <p>
-        <a-button type="primary" @click="add()">新增</a-button>
+        <a-form layout="inline" :model="queryForm">
+          <a-form-item>
+            <a-input v-model:value="queryForm.name" placeholder="名称"/>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" html-type="submit" @click="handleQuery({page:1,size:pagination.pageSize})">查询</a-button>
+          </a-form-item>
+          <a-form-item>
+            <a-button type="primary" @click="add()">新增</a-button>
+          </a-form-item>
+        </a-form>
+
       </p>
       <a-table
           :columns="columns"
@@ -115,6 +126,10 @@ export default defineComponent({
   setup() {
 
     const ebooks = ref()
+    const queryForm = ref();
+    queryForm.value = {
+      name:null
+    };
     const tableLoading = ref(false);
     const pagination = ref({
       current: 1,
@@ -196,7 +211,11 @@ export default defineComponent({
     const handleQuery = params =>{
       tableLoading.value = true;
       axios.get("/ebook/list",{
-        params,
+        params:{
+          page:params.page,
+          size:params.size,
+          name:queryForm.value.name
+        },
       }).then(res=>{
         tableLoading.value = false;
         const data = res.data;
@@ -222,12 +241,15 @@ export default defineComponent({
       ebook,
       pageChange,
 
+      handleQuery,
+
       handleOk,
       modalText,
       modalVisible,
       modalLoading,
       pagination,
       tableLoading,
+      queryForm,
       ebooks,
       columns,
     };
