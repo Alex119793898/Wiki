@@ -130,14 +130,18 @@ export default defineComponent({
     const handleOk = () => {
       modalLoading.value = true;
       axios.post("/ebook/save",ebook.value).then(res=>{
+        modalLoading.value = false;
+
         if(res.data.success){
           modalVisible.value = false;
-          modalLoading.value = false;
 
           handleQuery({
             page: pagination.value.current,
             size: pagination.value.pageSize
           });
+        }else{
+
+          message.warning(res.data.message);
         }
 
       })
