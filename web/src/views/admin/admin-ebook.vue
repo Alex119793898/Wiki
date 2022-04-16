@@ -20,7 +20,14 @@
           <template v-else-if="column.key == 'action'">
             <a-space size="small">
               <a-button type="primary" @click="edit(record)">编辑</a-button>
-              <a-button type="danger">删除</a-button>
+              <a-popconfirm
+                  title="删除后不可恢复，确定删除吗?"
+                  ok-text="Yes"
+                  cancel-text="No"
+                  @confirm="del(record.id)"
+              >
+                <a-button type="danger">删除</a-button>
+              </a-popconfirm>
             </a-space>
 
           </template>
@@ -53,7 +60,7 @@
           <a-input v-model:value="ebook.category2Id" />
         </a-form-item>
         <a-form-item label="描述">
-          <a-input v-model:value="ebook.descriptionn" />
+          <a-input v-model:value="ebook.description" />
         </a-form-item>
       </a-form>
     </a-modal>
@@ -141,7 +148,7 @@ export default defineComponent({
         name: '',
         category1Id: '',
         category2Id: '',
-        descriptionn: '',
+        description: '',
       }
     });
 
@@ -155,6 +162,17 @@ export default defineComponent({
     const add = ()=>{
       ebook.value = {};
       modalVisible.value = true;
+    }
+
+    const del = id =>{
+      axios.delete("/ebook/delete/" + id).then(res=>{
+        if(res.data.success){
+          handleQuery({
+            page: pagination.value.current,
+            size: pagination.value.pageSize
+          });
+        }
+      })
     }
 
     /*分页*/
@@ -190,6 +208,7 @@ export default defineComponent({
     return {
       edit,
       add,
+      del,
       ebook,
       pageChange,
 
