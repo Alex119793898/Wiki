@@ -2,14 +2,15 @@ package com.caoliang.wiki.controller;
 
 import com.caoliang.wiki.req.CategoryQueryReq;
 import com.caoliang.wiki.req.CategorySaveReq;
-import com.caoliang.wiki.resp.CommonResp;
 import com.caoliang.wiki.resp.CategoryQueryResp;
+import com.caoliang.wiki.resp.CommonResp;
 import com.caoliang.wiki.resp.PageResp;
 import com.caoliang.wiki.service.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/category")
@@ -17,6 +18,14 @@ public class CategoryController {
 
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping("/all")
+    public CommonResp all(){
+        CommonResp<List<CategoryQueryResp>> resp = new CommonResp<>();
+        List<CategoryQueryResp> list = categoryService.all();
+        resp.setContent(list);
+        return resp;
+    }
 
     @GetMapping("/list")
     public CommonResp list(@Valid CategoryQueryReq req){

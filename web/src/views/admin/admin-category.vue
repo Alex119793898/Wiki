@@ -5,11 +5,11 @@
     >
       <p>
         <a-form layout="inline" :model="queryForm">
-          <a-form-item>
+          <!--<a-form-item>
             <a-input v-model:value="queryForm.name" placeholder="名称"/>
-          </a-form-item>
+          </a-form-item>-->
           <a-form-item>
-            <a-button type="primary" html-type="submit" @click="handleQuery({page:1,size:pagination.pageSize})">查询</a-button>
+            <a-button type="primary" html-type="submit" @click="handleQuery()">查询</a-button>
           </a-form-item>
           <a-form-item>
             <a-button type="primary" @click="add()">新增</a-button>
@@ -20,9 +20,8 @@
       <a-table
           :columns="columns"
           :data-source="categorys"
-          :pagination="pagination"
+          :pagination="false"
           :loading="tableLoading"
-          @change="pageChange"
       >
         <template #bodyCell="{column,record}">
           <template v-if="column.key == 'cover'">
@@ -109,11 +108,6 @@ export default defineComponent({
     });
     
     const tableLoading = ref(false);
-    const pagination = ref({
-      current: 1,
-      pageSize: 4,
-      total: 0
-    })
 
     /*弹窗*/
     const modalText = ref('Content of the modal');
@@ -128,10 +122,7 @@ export default defineComponent({
         if(res.data.success){
           modalVisible.value = false;
 
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize
-          });
+          handleQuery();
         }else{
 
           message.warning(res.data.message);
@@ -166,40 +157,20 @@ export default defineComponent({
     const del = id =>{
       axios.delete("/category/delete/" + id).then(res=>{
         if(res.data.success){
-          handleQuery({
-            page: pagination.value.current,
-            size: pagination.value.pageSize
-          });
+          handleQuery();
         }
       })
     }
 
-    /*分页*/
-    const pageChange = pageParam =>{
-      console.log("分页参数",pageParam)
-      handleQuery({
-        page:pageParam.current,
-        size:pageParam.pageSize
-      })
-
-      pagination.value.current = pageParam.current;
-    }
 
     /*请求*/
-    const handleQuery = params =>{
+    const handleQuery = () =>{
       tableLoading.value = true;
-      axios.get("/category/list",{
-        params:{
-          page:params.page,
-          size:params.size,
-          name:queryForm.value.name
-        },
-      }).then(res=>{
+      axios.get("/category/all").then(res=>{
         tableLoading.value = false;
         const data = res.data;
         if(data.success){
-          categorys.value = data.content.list;
-          pagination.value.total = data.content.total;
+          categorys.value = data.content;
         }else{
           message.warning(data.message)
         }
@@ -207,17 +178,13 @@ export default defineComponent({
     }
 
     onMounted(()=>{
-      handleQuery({
-        page: 1,
-        size: pagination.value.pageSize
-      });
+      handleQuery();
     })
     return {
       edit,
       add,
       del,
       category,
-      pageChange,
 
       handleQuery,
 
@@ -225,7 +192,6 @@ export default defineComponent({
       modalText,
       modalVisible,
       modalLoading,
-      pagination,
       tableLoading,
       queryForm,
       categorys,
