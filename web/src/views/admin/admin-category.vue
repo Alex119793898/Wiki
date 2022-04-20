@@ -88,6 +88,7 @@
 import { defineComponent, onMounted, ref, reactive } from 'vue';
 import axios from "axios";
 import { message } from 'ant-design-vue';
+import { array2Tree } from '@/util/tool'
 
 const columns = [
   {
@@ -216,21 +217,7 @@ export default defineComponent({
       })
     }
 
-    function array2Tree(arr,parentId){
-      const result = [];
-      arr.forEach(item=>{
-        if(Number(item.parent) === Number(parentId)){
-          result.push(item);
 
-          const children = array2Tree(arr,item.id);
-          if(children.length>0){
-            item.children = children;
-          }
-        }
-      })
-
-      return result;
-    }
 
     onMounted(()=>{
       handleQuery();

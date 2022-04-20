@@ -9,8 +9,10 @@ public class EbookQueryResp {
 
     private String name;
 
+    @JSONField(serializeUsing = LongToStringSerializer.class)
     private Long category1Id;
 
+    @JSONField(serializeUsing = LongToStringSerializer.class)
     private Long category2Id;
 
     private String description;

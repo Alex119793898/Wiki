@@ -64,11 +64,19 @@
         <a-form-item label="名称">
           <a-input v-model:value="ebook.name" />
         </a-form-item>
-        <a-form-item label="分类一">
+        <!--<a-form-item label="分类一">
           <a-input v-model:value="ebook.category1Id" />
         </a-form-item>
         <a-form-item label="分类二">
           <a-input v-model:value="ebook.category2Id" />
+        </a-form-item>-->
+        <a-form-item label="分类">
+          <a-cascader
+              v-model:value="categoryIds"
+              :field-names="{label:'name',value:'id',children:'children'}"
+              :options="levelTree"
+              placeholder="请选择"
+          />
         </a-form-item>
         <a-form-item label="描述">
           <a-input v-model:value="ebook.description" />
@@ -81,6 +89,7 @@
 import { defineComponent, onMounted, ref, reactive } from 'vue';
 import axios from "axios";
 import { message } from 'ant-design-vue';
+import { array2Tree } from '@/util/tool'
 
 const columns = [
   {
@@ -144,6 +153,9 @@ export default defineComponent({
 
     const handleOk = () => {
       modalLoading.value = true;
+      ebook.value.category1Id = categoryIds.value[0];
+      ebook.value.category2Id = categoryIds.value[1];
+
       axios.post("/ebook/save",ebook.value).then(res=>{
         modalLoading.value = false;
 
@@ -177,6 +189,7 @@ export default defineComponent({
       console.log(record)
 
       ebook.value = JSON.parse(JSON.stringify(record));
+      categoryIds.value = [ebook.value.category1Id,ebook.value.category2Id];
       modalVisible.value = true;
     }
 
@@ -228,11 +241,31 @@ export default defineComponent({
       })
     }
 
+    const categoryIds = ref([]);
+    const levelTree = ref([]);
+
+    /*分类数据*/
+    const handleQueryCategory = () =>{
+      tableLoading.value = true;
+      axios.get("/category/all").then(res=>{
+        tableLoading.value = false;
+        const data = res.data;
+        if(data.success){
+          levelTree.value = array2Tree(data.content,0);
+
+          console.log("树形结构:",levelTree.value)
+        }else{
+          message.warning(data.message)
+        }
+      })
+    }
+
     onMounted(()=>{
       handleQuery({
         page: 1,
         size: pagination.value.pageSize
       });
+      handleQueryCategory();
     })
     return {
       edit,
@@ -252,6 +285,9 @@ export default defineComponent({
       queryForm,
       ebooks,
       columns,
+
+      levelTree,
+      categoryIds
     };
   },
 });
