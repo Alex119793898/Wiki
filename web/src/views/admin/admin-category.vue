@@ -61,7 +61,20 @@
           <a-input v-model:value="category.name" />
         </a-form-item>
         <a-form-item label="父分类">
-          <a-input v-model:value="category.parent" />
+          <a-select v-model:value="category.parent">
+
+            <a-select-option value="0" >
+              无
+            </a-select-option>
+            <a-select-option
+                v-for="c in levelTree"
+                :key="c.id"
+                :value="c.id"
+                :disabled="category.id === c.id"
+            >
+              {{c.name}}
+            </a-select-option>
+          </a-select>
         </a-form-item>
         <a-form-item label="顺序">
           <a-input v-model:value="category.sort" />
@@ -193,6 +206,10 @@ export default defineComponent({
           levelTree.value = array2Tree(data.content,0);
 
           console.log(levelTree.value)
+
+          levelTree.value.forEach(ele=>{          //key属性是table表格用于区分的，避免一个展开全都被展开了
+            ele.key = ele.id;
+          })
         }else{
           message.warning(data.message)
         }
@@ -202,7 +219,6 @@ export default defineComponent({
     function array2Tree(arr,parentId){
       const result = [];
       arr.forEach(item=>{
-        console.log(item.parent,parentId)
         if(Number(item.parent) === Number(parentId)){
           result.push(item);
 

@@ -7,6 +7,7 @@ public class CategoryQueryResp {
     @JSONField(serializeUsing = LongToStringSerializer.class)
     private Long id;
 
+    @JSONField(serializeUsing = LongToStringSerializer.class)
     private Long parent;
 
     private String name;
