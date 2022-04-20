@@ -19,7 +19,7 @@
       </p>
       <a-table
           :columns="columns"
-          :data-source="categorys"
+          :data-source="levelTree"
           :pagination="false"
           :loading="tableLoading"
       >
@@ -162,6 +162,26 @@ export default defineComponent({
       })
     }
 
+    /*
+    * 树型数据
+    * [
+        {
+          children: [
+            {
+              id:"",
+              name:"VUE"
+              parent: 100
+              sort: 100
+            }
+          ]
+          id: "100"
+          name: "前端开发"
+          parent: 0
+          sort: 100
+        }
+    * ]
+    * */
+    const levelTree = ref([]);
 
     /*请求*/
     const handleQuery = () =>{
@@ -170,11 +190,30 @@ export default defineComponent({
         tableLoading.value = false;
         const data = res.data;
         if(data.success){
-          categorys.value = data.content;
+          levelTree.value = array2Tree(data.content,0);
+
+          console.log(levelTree.value)
         }else{
           message.warning(data.message)
         }
       })
+    }
+
+    function array2Tree(arr,parentId){
+      const result = [];
+      arr.forEach(item=>{
+        console.log(item.parent,parentId)
+        if(Number(item.parent) === Number(parentId)){
+          result.push(item);
+
+          const children = array2Tree(arr,item.id);
+          if(children.length>0){
+            item.children = children;
+          }
+        }
+      })
+
+      return result;
     }
 
     onMounted(()=>{
@@ -194,7 +233,7 @@ export default defineComponent({
       modalLoading,
       tableLoading,
       queryForm,
-      categorys,
+      levelTree,
       columns,
     };
   },
