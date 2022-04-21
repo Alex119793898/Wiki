@@ -22,7 +22,10 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-list :grid="{ gutter: 20, column: 3 }" :data-source="ebookList">
+      <div class="welcome" v-show="isShowWelcome">
+        <h1>欢迎页面</h1>
+      </div>
+      <a-list v-show="!isShowWelcome" :grid="{ gutter: 20, column: 3 }" :data-source="ebookList">
         <template #renderItem="{ item }">
           <a-list-item key="item.name">
             <template #actions>
@@ -58,6 +61,8 @@ export default defineComponent({
   },
   setup() {
 
+    const isShowWelcome = ref(true);
+
     const ebookList = ref();
     const handleQuery = ()=>{
       axios.get("/ebook/list",{params:{page:1,size:1000}}).then(res=>{
@@ -83,6 +88,11 @@ export default defineComponent({
 
     const handleMenuClick = (event)=>{
       console.log(event)
+      if(event.key === 'welcome'){
+        isShowWelcome.value = true;
+      }else{
+        isShowWelcome.value = false;
+      }
     }
 
     onMounted(()=>{
@@ -95,6 +105,7 @@ export default defineComponent({
       levelTree,
       handleMenuClick,
 
+      isShowWelcome,
       actions: [
         { type: 'StarOutlined', text: '156' },
         { type: 'LikeOutlined', text: '156' },
