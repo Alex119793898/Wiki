@@ -28,6 +28,9 @@
           <template v-if="column.key == 'cover'">
             <img :src="record.cover" alt="avater">
           </template>
+          <template v-if="column.key == 'category'">
+            <span>{{getCategoryName(record.category1Id)}} / {{getCategoryName(record.category2Id)}}</span>
+          </template>
           <template v-else-if="column.key == 'action'">
             <a-space size="small">
               <a-button type="primary" @click="edit(record)">编辑</a-button>
@@ -102,13 +105,17 @@ const columns = [
     dataIndex: 'name',
     key: 'age',
   },
-  {
+  /*{
     title: '分类一',
     dataIndex: 'category1Id',
   },
   {
     title: '分类二',
     dataIndex: 'category2Id',
+  },*/
+  {
+    title: '分类',
+    key: 'category',
   },
   {
     title: '文档数',
@@ -243,6 +250,7 @@ export default defineComponent({
 
     const categoryIds = ref([]);
     const levelTree = ref([]);
+    let categoryData ;
 
     /*分类数据*/
     const handleQueryCategory = () =>{
@@ -251,6 +259,7 @@ export default defineComponent({
         tableLoading.value = false;
         const data = res.data;
         if(data.success){
+          categoryData = data.content;
           levelTree.value = array2Tree(data.content,0);
 
           console.log("树形结构:",levelTree.value)
@@ -260,12 +269,22 @@ export default defineComponent({
       })
     }
 
-    onMounted(()=>{
-      handleQuery({
+    const getCategoryName = (cid)=>{
+      let result = "";
+      categoryData.forEach(ele=>{
+        if(ele.id == cid){
+          result = ele.name;
+        }
+      })
+      return result;
+    }
+
+    onMounted( async ()=>{
+      await handleQueryCategory();
+      await handleQuery({
         page: 1,
         size: pagination.value.pageSize
       });
-      handleQueryCategory();
     })
     return {
       edit,
@@ -287,7 +306,8 @@ export default defineComponent({
       columns,
 
       levelTree,
-      categoryIds
+      categoryIds,
+      getCategoryName,
     };
   },
 });
