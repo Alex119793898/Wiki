@@ -67,7 +67,7 @@ drop table if exists `doc`;
 create table doc (
     id bigint not null comment 'id',
     ebook_id bigint not null comment '电子书id',
-    parent bigint not null default 0 comment '父id',
+    parent bigint not null default 0 comment '父文档id',
     name varchar(50) not null comment '名称',
     sort int comment '顺序',
     view_count int default 0 comment '阅读数',
