@@ -62,10 +62,17 @@ export default defineComponent({
   setup() {
 
     const isShowWelcome = ref(true);
+    let category2Id = 0;
 
     const ebookList = ref();
-    const handleQuery = ()=>{
-      axios.get("/ebook/list",{params:{page:1,size:1000}}).then(res=>{
+    const handleQuery = () =>{
+      axios.get("/ebook/list",{
+        params:{
+          page:1,
+          size:1000,
+          category2Id:category2Id
+        }
+      }).then(res=>{
         ebookList.value = res.data.content.list;
       })
     }
@@ -92,11 +99,12 @@ export default defineComponent({
         isShowWelcome.value = true;
       }else{
         isShowWelcome.value = false;
+        category2Id = event.key;
+        handleQuery();
       }
     }
 
     onMounted(()=>{
-      handleQuery();
       handleQueryCategory();
     })
 
