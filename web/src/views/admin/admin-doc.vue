@@ -98,6 +98,7 @@ import { defineComponent, onMounted, ref, reactive, nextTick } from 'vue';
 import axios from "axios";
 import { message } from 'ant-design-vue';
 import { array2Tree, setDisabled } from '@/util/tool'
+import {useRoute} from "vue-router";
 
 const columns = [
   {
@@ -124,7 +125,7 @@ export default defineComponent({
   components: {
   },
   setup() {
-
+    const route = useRoute();
     const docs = ref()
     const queryForm = ref({
       name:null
@@ -208,8 +209,7 @@ export default defineComponent({
     const edit = record => {
       levelTreeSelect.value = JSON.parse(JSON.stringify(levelTree.value));
       setDisabled(levelTreeSelect.value,record.id);
-      console.log(levelTreeSelect.value)
-      //levelTreeSelect.value.unshift({id:0,name:'无'});
+      levelTreeSelect.value.unshift({id:0,name:'无'});
 
       doc.value = JSON.parse(JSON.stringify(record));
       modalVisible.value = true;
@@ -217,7 +217,13 @@ export default defineComponent({
     }
 
     const add = ()=>{
-      doc.value = {};
+      doc.value = {
+        ebookId: route.query.ebookId
+      };
+
+      levelTreeSelect.value = JSON.parse(JSON.stringify(levelTree.value));
+      levelTreeSelect.value.unshift({id:0,name:'无'});
+
       modalVisible.value = true;
     }
 
