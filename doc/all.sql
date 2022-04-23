@@ -86,3 +86,10 @@ insert into doc (id,ebook_id,parent,name,sort,view_count,vote_count) values (8,1
 insert into doc (id,ebook_id,parent,name,sort,view_count,vote_count) values (9,1,8,'文档3.1',1,0,0);
 insert into doc (id,ebook_id,parent,name,sort,view_count,vote_count) values (10,1,8,'文档3.2',2,0,0);
 insert into doc (id,ebook_id,parent,name,sort,view_count,vote_count) values (11,1,8,'文档3.3',3,0,0);
+
+drop table if exists content;
+create table content (
+    id bigint not null comment '文档id',
+    content mediumtext not null comment '内容',
+    primary key (id)
+) engine = innodb default charset=utf8mb4 comment='文档内容';
