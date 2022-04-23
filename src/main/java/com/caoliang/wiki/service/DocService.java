@@ -1,6 +1,8 @@
 package com.caoliang.wiki.service;
 
+import com.caoliang.wiki.mapper.ContentMapper;
 import com.caoliang.wiki.mapper.DocMapper;
+import com.caoliang.wiki.pojo.Content;
 import com.caoliang.wiki.pojo.Doc;
 import com.caoliang.wiki.pojo.DocExample;
 import com.caoliang.wiki.req.DocQueryReq;
@@ -27,6 +29,9 @@ public class DocService {
 
     @Autowired(required = false)
     private DocMapper docMapper;
+
+    @Autowired(required = false)
+    private ContentMapper contentMapper;
 
     @Resource
     private SnowFlake snowFlake;
@@ -78,15 +83,27 @@ public class DocService {
 
     public void save(DocSaveReq req) {
 
-        Doc copy = CopyUtil.copy(req, Doc.class);
+        Doc doc = CopyUtil.copy(req, Doc.class);
+
+        Content content = CopyUtil.copy(req, Content.class);
+
         if(ObjectUtils.isEmpty(req.getId())){
             //新增
-            long id = snowFlake.nextId();
-            copy.setId(id);
-            docMapper.insert(copy);
+            doc.setId(snowFlake.nextId());
+            docMapper.insert(doc);
+
+            //content表中对应新增记录
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         }else{
             //更新
-            docMapper.updateByPrimaryKey(copy);
+            docMapper.updateByPrimaryKey(doc);
+
+            //content表中对应更新记录
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if(count == 0){
+                contentMapper.insert(content);
+            }
         }
     }
 

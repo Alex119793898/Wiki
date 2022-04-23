@@ -95,7 +95,7 @@
                 />
                 <Editor
                     style="height: 500px; overflow-y: hidden;"
-                    v-model="valueHtml"
+                    v-model="doc.content"
                     :defaultConfig="editorConfig"
                     :mode="mode"
                     @onCreated="handleCreated"
@@ -236,6 +236,7 @@ export default defineComponent({
         cover:'',
         name: '',
         parent: '',
+        content:'',
       }
     });
 
@@ -268,8 +269,6 @@ export default defineComponent({
     // 编辑器实例，必须用 shallowRef
     const editorRef = shallowRef()
 
-    // 内容 HTML
-    const valueHtml = ref('<p>hello</p>')
 
     const toolbarConfig = {}
     const editorConfig = { placeholder: '请输入内容...' }
@@ -279,7 +278,6 @@ export default defineComponent({
     }
 
     onMounted(()=>{
-      valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>';
       handleQuery();
     })
 
@@ -308,7 +306,6 @@ export default defineComponent({
       columns,
 
       editorRef,
-      valueHtml,
       mode: 'default',
       toolbarConfig,
       editorConfig,
