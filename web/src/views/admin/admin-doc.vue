@@ -185,7 +185,7 @@ export default defineComponent({
     const levelTree = ref([]);
     const levelTreeSelect = ref([]);
 
-    /*请求*/
+    /*列表*/
     const handleQuery = () =>{
       tableLoading.value = true;
       axios.get("/doc/all").then(res=>{
@@ -208,19 +208,26 @@ export default defineComponent({
       })
     }
 
+    /*内容*/
+    const handleQueryContent = () =>{
+      axios.get("/doc/find-content/" + doc.value.id).then(res=>{
+        const data = res.data;
+        if(data.success){
+          doc.value.content = data.content;
+        }else{
+          message.warning(data.message)
+        }
+      })
+    }
+
     /*弹窗*/
     const modalText = ref('Content of the modal');
-    const modalVisible = ref(false);
-    const modalLoading = ref(false);
 
     const handleOk = () => {
-      modalLoading.value = true;
       axios.post("/doc/save",doc.value).then(res=>{
-        modalLoading.value = false;
 
         if(res.data.success){
-          modalVisible.value = false;
-
+          message.success("文档保存成功!");
           handleQuery();
         }else{
 
@@ -246,7 +253,7 @@ export default defineComponent({
       levelTreeSelect.value.unshift({id:0,name:'无'});
 
       doc.value = JSON.parse(JSON.stringify(record));
-      modalVisible.value = true;
+      handleQueryContent();
 
     }
 
@@ -255,7 +262,6 @@ export default defineComponent({
         ebookId: route.query.ebookId
       };
 
-      modalVisible.value = true;
     }
 
     const del = id =>{
@@ -297,8 +303,6 @@ export default defineComponent({
 
       handleOk,
       modalText,
-      modalVisible,
-      modalLoading,
       tableLoading,
       queryForm,
       levelTree,
