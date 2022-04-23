@@ -227,30 +227,8 @@ export default defineComponent({
       modalVisible.value = true;
     }
 
-    const deleteIds = [];
-    const getDeleteIds = (arr,id)=>{
-      arr.forEach(node=>{
-        if(Number(node.id) === Number(id)){
-          deleteIds.push(id);
-
-          const children = node.children;
-          if(children && children.length>0){
-            children.forEach(child=>{
-              getDeleteIds(children,child.id)
-            })
-          }
-        }else{
-          const children = node.children;
-          if(children && children.length>0){
-            getDeleteIds(children,id);
-          }
-        }
-      })
-    }
     const del = id =>{
-      deleteIds.splice(0,deleteIds.length);
-      getDeleteIds(levelTree.value,id);
-      axios.delete("/doc/delete/" + deleteIds.join(',')).then(res=>{
+      axios.delete("/doc/delete/" + id).then(res=>{
         if(res.data.success){
           handleQuery();
         }
