@@ -3,112 +3,119 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <p>
-        <a-form layout="inline" :model="queryForm">
-          <!--<a-form-item>
-            <a-input v-model:value="queryForm.name" placeholder="名称"/>
-          </a-form-item>-->
-          <a-form-item>
-            <a-button type="primary" html-type="submit" @click="handleQuery()">查询</a-button>
-          </a-form-item>
-          <a-form-item>
-            <a-button type="primary" @click="add()">新增</a-button>
-          </a-form-item>
-        </a-form>
+      <a-row>
+        <a-col :span="8">
+          <p>
+            <a-form layout="inline" :model="queryForm">
+              <!--<a-form-item>
+                <a-input v-model:value="queryForm.name" placeholder="名称"/>
+              </a-form-item>-->
+              <a-form-item>
+                <a-button type="primary" html-type="submit" @click="handleQuery()">查询</a-button>
+              </a-form-item>
+              <a-form-item>
+                <a-button type="primary" @click="add()">新增</a-button>
+              </a-form-item>
+            </a-form>
 
-      </p>
-      <a-table
-          :columns="columns"
-          :data-source="levelTree"
-          :pagination="false"
-          :loading="tableLoading"
-      >
-        <template #bodyCell="{column,record}">
-          <template v-if="column.key == 'cover'">
-            <img :src="record.cover" alt="avater">
-          </template>
-          <template v-else-if="column.key == 'action'">
-            <a-space size="small">
-              <a-button type="primary" @click="edit(record)">编辑</a-button>
-              <a-popconfirm
-                  title="删除后不可恢复，确定删除吗?"
-                  ok-text="Yes"
-                  cancel-text="No"
-                  @confirm="del(record.id)"
+          </p>
+          <a-table
+              :columns="columns"
+              :data-source="levelTree"
+              :pagination="false"
+              :loading="tableLoading"
+          >
+            <template #bodyCell="{column,record}">
+              <template v-if="column.key == 'cover'">
+                <img :src="record.cover" alt="avater">
+              </template>
+              <template v-else-if="column.key == 'action'">
+                <a-space size="small">
+                  <a-button type="primary" @click="edit(record)">编辑</a-button>
+                  <a-popconfirm
+                      title="删除后不可恢复，确定删除吗?"
+                      ok-text="Yes"
+                      cancel-text="No"
+                      @confirm="del(record.id)"
+                  >
+                    <a-button type="danger">删除</a-button>
+                  </a-popconfirm>
+                </a-space>
+
+              </template>
+            </template>
+            <!--<template v-slot:cover="{record}">
+              <img :src="record.cover" alt="avater">
+            </template>-->
+          </a-table>
+        </a-col>
+        <a-col :span="16">
+          <a-form :model="doc" :label-col="{span:6}">
+            <a-form-item label="名称">
+              <a-input v-model:value="doc.name" />
+            </a-form-item>
+            <a-form-item label="父文档">
+              <!--<a-select v-model:value="doc.parent">
+                <a-select-option value="0" >
+                  无
+                </a-select-option>
+                <a-select-option
+                    v-for="c in levelTree"
+                    :key="c.id"
+                    :value="c.id"
+                    :disabled="doc.id === c.id"
+                >
+                  {{c.name}}
+                </a-select-option>
+              </a-select>-->
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  :tree-data="levelTreeSelect"
+                  :fieldNames="{label:'name', key:'id', value: 'id'}"
+                  show-search
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  placeholder="Please select"
+                  tree-default-expand-all
               >
-                <a-button type="danger">删除</a-button>
-              </a-popconfirm>
-            </a-space>
+              </a-tree-select>
+            </a-form-item>
+            <a-form-item label="顺序">
+              <a-input v-model:value="doc.sort" />
+            </a-form-item>
+            <a-form-item label="内容">
+              <div style="border: 1px solid #ccc">
+                <Toolbar
+                    style="border-bottom: 1px solid #ccc"
+                    :editor="editorRef"
+                    :defaultConfig="toolbarConfig"
+                    :mode="mode"
+                />
+                <Editor
+                    style="height: 500px; overflow-y: hidden;"
+                    v-model="valueHtml"
+                    :defaultConfig="editorConfig"
+                    :mode="mode"
+                    @onCreated="handleCreated"
+                />
+              </div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
 
-          </template>
-        </template>
-        <!--<template v-slot:cover="{record}">
-          <img :src="record.cover" alt="avater">
-        </template>-->
-      </a-table>
     </a-layout-content>
   </a-layout>
 
-  <div>
+  <!--<div>
     <a-modal
         title="文档表单"
         v-model:visible="modalVisible"
         :confirm-loading="modalLoading"
         @ok="handleOk"
     >
-      <a-form :model="doc" :label-col="{span:6}">
-        <a-form-item label="名称">
-          <a-input v-model:value="doc.name" />
-        </a-form-item>
-        <a-form-item label="父文档">
-          <!--<a-select v-model:value="doc.parent">
-            <a-select-option value="0" >
-              无
-            </a-select-option>
-            <a-select-option
-                v-for="c in levelTree"
-                :key="c.id"
-                :value="c.id"
-                :disabled="doc.id === c.id"
-            >
-              {{c.name}}
-            </a-select-option>
-          </a-select>-->
-          <a-tree-select
-              v-model:value="doc.parent"
-              :tree-data="levelTreeSelect"
-              :fieldNames="{label:'name', key:'id', value: 'id'}"
-              show-search
-              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-              placeholder="Please select"
-              tree-default-expand-all
-          >
-          </a-tree-select>
-        </a-form-item>
-        <a-form-item label="顺序">
-          <a-input v-model:value="doc.sort" />
-        </a-form-item>
-        <a-form-item label="内容">
-          <div style="border: 1px solid #ccc">
-            <Toolbar
-                style="border-bottom: 1px solid #ccc"
-                :editor="editorRef"
-                :defaultConfig="toolbarConfig"
-                :mode="mode"
-            />
-            <Editor
-                style="height: 500px; overflow-y: hidden;"
-                v-model="valueHtml"
-                :defaultConfig="editorConfig"
-                :mode="mode"
-                @onCreated="handleCreated"
-            />
-          </div>
-        </a-form-item>
 
-      </a-form>
     </a-modal>
-  </div>
+  </div>-->
 </template>
 <script>
 import { defineComponent, onMounted, onBeforeUnmount, ref, shallowRef, reactive, nextTick } from 'vue';
