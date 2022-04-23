@@ -3,7 +3,7 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-row>
+      <a-row :gutter="24">
         <a-col :span="8">
           <p>
             <a-form layout="inline" :model="queryForm">
@@ -20,25 +20,24 @@
 
           </p>
           <a-table
+              v-if="levelTree.length"
               :columns="columns"
               :data-source="levelTree"
               :pagination="false"
               :loading="tableLoading"
+              :defaultExpandAllRows="true"
           >
             <template #bodyCell="{column,record}">
-              <template v-if="column.key == 'cover'">
-                <img :src="record.cover" alt="avater">
-              </template>
-              <template v-else-if="column.key == 'action'">
+              <template v-if="column.key == 'action'">
                 <a-space size="small">
-                  <a-button type="primary" @click="edit(record)">编辑</a-button>
+                  <a-button type="primary" @click="edit(record)" size="small">编辑</a-button>
                   <a-popconfirm
                       title="删除后不可恢复，确定删除吗?"
                       ok-text="Yes"
                       cancel-text="No"
                       @confirm="del(record.id)"
                   >
-                    <a-button type="danger">删除</a-button>
+                    <a-button type="danger" size="small">删除</a-button>
                   </a-popconfirm>
                 </a-space>
 
@@ -50,11 +49,15 @@
           </a-table>
         </a-col>
         <a-col :span="16">
-          <a-form :model="doc" :label-col="{span:6}">
-            <a-form-item label="名称">
-              <a-input v-model:value="doc.name" />
+          <p>
+            <a-button type="primary" @click="handleOk">保存</a-button>
+          </p>
+
+          <a-form :model="doc" layout="vertical" :label-col="{span:6}">
+            <a-form-item>
+              <a-input v-model:value="doc.name" placeholder="名称"/>
             </a-form-item>
-            <a-form-item label="父文档">
+            <a-form-item>
               <!--<a-select v-model:value="doc.parent">
                 <a-select-option value="0" >
                   无
@@ -74,15 +77,15 @@
                   :fieldNames="{label:'name', key:'id', value: 'id'}"
                   show-search
                   :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-                  placeholder="Please select"
+                  placeholder="请选择父文档"
                   tree-default-expand-all
               >
               </a-tree-select>
             </a-form-item>
-            <a-form-item label="顺序">
-              <a-input v-model:value="doc.sort" />
+            <a-form-item>
+              <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
-            <a-form-item label="内容">
+            <a-form-item>
               <div style="border: 1px solid #ccc">
                 <Toolbar
                     style="border-bottom: 1px solid #ccc"
@@ -195,6 +198,10 @@ export default defineComponent({
             ele.key = ele.id;
           })
 
+          //初始化父文档树形下拉选择数据
+          levelTreeSelect.value = JSON.parse(JSON.stringify(levelTree.value));
+          levelTreeSelect.value.unshift({id:0,name:'无'});
+
         }else{
           message.warning(data.message)
         }
@@ -246,9 +253,6 @@ export default defineComponent({
       doc.value = {
         ebookId: route.query.ebookId
       };
-
-      levelTreeSelect.value = JSON.parse(JSON.stringify(levelTree.value));
-      levelTreeSelect.value.unshift({id:0,name:'无'});
 
       modalVisible.value = true;
     }
