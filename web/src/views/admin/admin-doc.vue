@@ -61,8 +61,7 @@
           <a-input v-model:value="doc.name" />
         </a-form-item>
         <a-form-item label="父文档">
-          <a-select v-model:value="doc.parent">
-
+          <!--<a-select v-model:value="doc.parent">
             <a-select-option value="0" >
               无
             </a-select-option>
@@ -74,7 +73,17 @@
             >
               {{c.name}}
             </a-select-option>
-          </a-select>
+          </a-select>-->
+          <a-tree-select
+              v-model:value="doc.parent"
+              :tree-data="levelTreeSelect"
+              :fieldNames="{label:'name', key:'id', value: 'id'}"
+              show-search
+              :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+              placeholder="Please select"
+              tree-default-expand-all
+          >
+          </a-tree-select>
         </a-form-item>
         <a-form-item label="顺序">
           <a-input v-model:value="doc.sort" />
@@ -85,10 +94,10 @@
   </div>
 </template>
 <script>
-import { defineComponent, onMounted, ref, reactive } from 'vue';
+import { defineComponent, onMounted, ref, reactive, nextTick } from 'vue';
 import axios from "axios";
 import { message } from 'ant-design-vue';
-import { array2Tree } from '@/util/tool'
+import { array2Tree, setDisabled } from '@/util/tool'
 
 const columns = [
   {
@@ -123,6 +132,48 @@ export default defineComponent({
     
     const tableLoading = ref(false);
 
+
+    /*
+    * 树型数据
+    * [
+        {
+          children: [
+            {
+              id:"",
+              name:"VUE"
+              parent: 100
+              sort: 100
+            }
+          ]
+          id: "100"
+          name: "前端开发"
+          parent: 0
+          sort: 100
+        }
+    * ]
+    * */
+    const levelTree = ref([]);
+    const levelTreeSelect = ref([]);
+
+    /*请求*/
+    const handleQuery = () =>{
+      tableLoading.value = true;
+      axios.get("/doc/all").then(res=>{
+        tableLoading.value = false;
+        const data = res.data;
+        if(data.success){
+          levelTree.value = array2Tree(data.content,0);
+
+          levelTree.value.forEach(ele=>{          //key属性是table表格用于区分的，避免一个展开全都被展开了
+            ele.key = ele.id;
+          })
+
+        }else{
+          message.warning(data.message)
+        }
+      })
+    }
+
     /*弹窗*/
     const modalText = ref('Content of the modal');
     const modalVisible = ref(false);
@@ -155,10 +206,14 @@ export default defineComponent({
     });
 
     const edit = record => {
-      console.log(record)
+      levelTreeSelect.value = JSON.parse(JSON.stringify(levelTree.value));
+      setDisabled(levelTreeSelect.value,record.id);
+      console.log(levelTreeSelect.value)
+      //levelTreeSelect.value.unshift({id:0,name:'无'});
 
       doc.value = JSON.parse(JSON.stringify(record));
       modalVisible.value = true;
+
     }
 
     const add = ()=>{
@@ -173,49 +228,6 @@ export default defineComponent({
         }
       })
     }
-
-    /*
-    * 树型数据
-    * [
-        {
-          children: [
-            {
-              id:"",
-              name:"VUE"
-              parent: 100
-              sort: 100
-            }
-          ]
-          id: "100"
-          name: "前端开发"
-          parent: 0
-          sort: 100
-        }
-    * ]
-    * */
-    const levelTree = ref([]);
-
-    /*请求*/
-    const handleQuery = () =>{
-      tableLoading.value = true;
-      axios.get("/doc/all").then(res=>{
-        tableLoading.value = false;
-        const data = res.data;
-        if(data.success){
-          levelTree.value = array2Tree(data.content,0);
-
-          console.log(levelTree.value)
-
-          levelTree.value.forEach(ele=>{          //key属性是table表格用于区分的，避免一个展开全都被展开了
-            ele.key = ele.id;
-          })
-        }else{
-          message.warning(data.message)
-        }
-      })
-    }
-
-
 
     onMounted(()=>{
       handleQuery();
@@ -235,6 +247,7 @@ export default defineComponent({
       tableLoading,
       queryForm,
       levelTree,
+      levelTreeSelect,
       columns,
     };
   },

@@ -34,9 +34,9 @@
           <template v-else-if="column.key == 'action'">
             <a-space size="small">
               <router-link to="/admin/doc">
-                <a-button type="primary" @click="edit(record)">文档管理</a-button>
+                <a-button type="primary" >文档管理</a-button>
               </router-link>
-              <a-button type="primary">编辑</a-button>
+              <a-button type="primary" @click="edit(record)">编辑</a-button>
               <a-popconfirm
                   title="删除后不可恢复，确定删除吗?"
                   ok-text="Yes"

@@ -13,3 +13,23 @@ export function array2Tree(arr,parentId){
 
     return result;
 }
+
+export function setDisabled(arr,id){
+    arr.forEach(node=>{
+        if(Number(node.id) === Number(id)){
+            node.disabled = true;
+
+            const children = node.children;
+            if(children && children.length>0){
+                children.forEach(child=>{
+                    setDisabled(children,child.id)
+                })
+            }
+        }else{
+            const children = node.children;
+            if(children && children.length>0){
+                setDisabled(children,id);
+            }
+        }
+    })
+}
